@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+<body>
+
+    <style type="text/css">
+        body {
+            min-width:600px;
+        }
+
+        a:link {
+            text-decoration:none;
+        }
+    </style>
+
+    {% block header %}
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-brand my-0 h1"><a href="{% url 'home' %}">Сервис по учету техники</a></span>
+        <form class="form-inline" action="{% url 'logout' %}" method="get">
+            <span class="mb-0">{{ user }} ({{ user.get_role_display }})</span>
+            <button class="btn btn-sm btn-outline-primary mx-2" type="submit">Выйти</button>
+        </form>
+    </nav>
+	{% endblock %}
+
+    {% block content %}
+        base block content
+	{% endblock %}
+</body>
+</html>

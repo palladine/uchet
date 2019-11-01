@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+    <div class="container-fluid m-0 p-0">
+        <div class="row"></div>
+        <div class="row d-flex justify-content-center m-0 p-0 mt-5">
+            <div class="col-1 col-sm-2"></div>
+            <div class="col-2 mt-5" style="min-width: 300px; max-width:300px; border: 0.2px solid #ccc">
+                <div class="row d-flex justify-content-center m-0 p-0">
+                <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-12 mt-4 input-group p-0">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-user"></i></span>
+                            </div>
+                            {{ form.login }}
+                    </div>
+
+                    <div class="col-12 mt-4 input-group p-0">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
+                            </div>
+                            {{ form.password }}
+                    </div>
+
+                    <div class="col-12 mt-4 mb-4 d-flex justify-content-between p-0">
+                        <input class="btn btn-primary btn-sm col-5" type="submit" value="Войти" name="enter">
+                        <input class="btn btn-outline-primary btn-sm col-6" type="submit" value="Регистрация" name="registration">
+                    </div>
+                </form>
+                    </div>
+            </div>
+            <div class="col-1 col-sm-2"></div>
+        </div>
+        <div class="row d-flex justify-content-center mt-1">
+            <div class="">
+                {% if error %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
