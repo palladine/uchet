@@ -22,4 +22,3 @@ class AddUnitForm(forms.Form):
     id_invent = forms.CharField(label='Инвентарный номер', required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
     id_sn = forms.CharField(label='Серийный номер', help_text=ht, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
     retired = forms.BooleanField(label="Списан", required=False, widget=forms.CheckboxInput(attrs={'class': ''}))
-    active = forms.BooleanField(label="Используется", required=False, widget=forms.CheckboxInput(attrs={'class': ''}))

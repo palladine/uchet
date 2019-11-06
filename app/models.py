@@ -24,7 +24,7 @@ class Unit(models.Model):
     id_sn = models.CharField(max_length=255, default='', null=False, blank=False, verbose_name="Серийный номер")
     arm = models.ForeignKey(ARM, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="АРМ")
     retired = models.BooleanField(default=False, blank=False, null=False, verbose_name="Списан")
-    active = models.BooleanField(default=True, blank=False, null=False, verbose_name="Используется")
+
 
     class Meta:
         verbose_name = "Системный блок"

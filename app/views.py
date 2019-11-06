@@ -81,13 +81,29 @@ class AddItem(View):
         context = {'form': form, 'item': item}
 
         if form.is_valid():
-            if item == 'unit':
 
+            if item == 'unit':
                 # addition to base
-                model = request.POST['model']
+                model = request.POST.get('model')
+                memory = request.POST.get('memory')
+                os = request.POST.get('os')
+                id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                retired = request.POST.get('retired')
+
+
+
+
 
                 messages.success(request, 'Системный блок добавлен')
-                return HttpResponseRedirect(reverse('add_item', args=(item,)))
+
+
+            if item == 'monitor':
+                ...
+
+
+            return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:
             messages.error(request, form.errors)
         return render(request, 'add_item.html', context=context)
