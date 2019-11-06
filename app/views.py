@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from .models import User
 from django.views import View
 from .forms import LoginForm, AddUnitForm
@@ -73,15 +74,22 @@ class AddItem(View):
             context.update({'title': 'Добавление системного блока', 'form': form, 'item': item})
         return render(request, 'add_item.html', context=context)
 
+
     def post(self, request, item):
-        form = AddUnitForm(request.POST)
-        context = {'form': form, 'item': item, 'title': 'Добавление системного блока'}
+        dic_forms = {'unit': AddUnitForm(request.POST)}
+        form = dic_forms[item]
+        context = {'form': form, 'item': item}
+
         if form.is_valid():
-            model = request.POST['model']
-            print(model)
-            context.update({'message': 'Системный блок добавлен.'})
+            if item == 'unit':
+
+                # addition to base
+                model = request.POST['model']
+
+                messages.success(request, 'Системный блок добавлен')
+                return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:
-            context.update({'error': form.errors})
+            messages.error(request, form.errors)
         return render(request, 'add_item.html', context=context)
 
 
