@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import User
+from .models import User, Unit
 from django.views import View
 from .forms import LoginForm, AddUnitForm
 from django.urls import reverse
@@ -91,6 +91,15 @@ class AddItem(View):
                 id_invent = request.POST.get('id_invent')
                 id_sn = request.POST.get('id_sn')
                 retired = request.POST.get('retired')
+
+                unit_item = Unit(model=model, id_sn=id_sn)
+                unit_item.memory = memory if memory else 0
+                unit_item.os = os
+                unit_item.id_naumen = id_naumen
+                unit_item.id_invent = id_invent
+                unit_item.retired = True if retired else False
+
+                unit_item.save()
 
 
 

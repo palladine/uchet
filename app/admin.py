@@ -10,6 +10,6 @@ admin.site.register(User, UserAdmin)
 
 
 class UnitAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'id', 'memory', 'os', 'id_naumen', 'id_invent', 'id_sn', 'arm', 'retired']
+    list_display = ['pk', 'model', 'memory', 'os', 'id_naumen', 'id_invent', 'id_sn', 'arm', 'retired']
 
 admin.site.register(Unit, UnitAdmin)
