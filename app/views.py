@@ -1,9 +1,9 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import User, Unit
+from .models import User, Unit, Monitor
 from django.views import View
-from .forms import LoginForm, AddUnitForm
+from .forms import LoginForm, AddUnitForm, AddMonitorForm
 from django.urls import reverse
 
 
@@ -72,18 +72,22 @@ class AddItem(View):
         if item == 'unit':
             form = AddUnitForm()
             context.update({'title': 'Добавление системного блока', 'form': form, 'item': item})
+
+        if item == 'monitor':
+            form = AddMonitorForm()
+            context.update({'title': 'Добавление монитора', 'form': form, 'item': item})
+
         return render(request, 'add_item.html', context=context)
 
 
     def post(self, request, item):
-        dic_forms = {'unit': AddUnitForm(request.POST)}
+        dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST)}
         form = dic_forms[item]
         context = {'form': form, 'item': item}
 
         if form.is_valid():
 
             if item == 'unit':
-                # addition to base
                 model = request.POST.get('model')
                 memory = request.POST.get('memory')
                 os = request.POST.get('os')
@@ -91,25 +95,28 @@ class AddItem(View):
                 id_invent = request.POST.get('id_invent')
                 id_sn = request.POST.get('id_sn')
                 retired = request.POST.get('retired')
-
                 unit_item = Unit(model=model, id_sn=id_sn)
                 unit_item.memory = memory if memory else 0
                 unit_item.os = os
                 unit_item.id_naumen = id_naumen
                 unit_item.id_invent = id_invent
                 unit_item.retired = True if retired else False
-
                 unit_item.save()
-
-
-
-
-
                 messages.success(request, 'Системный блок добавлен')
 
 
             if item == 'monitor':
-                ...
+                model = request.POST.get('model')
+                id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                retired = request.POST.get('retired')
+                monitor_item = Monitor(model=model, id_sn=id_sn)
+                monitor_item.id_naumen = id_naumen
+                monitor_item.id_invent = id_invent
+                monitor_item.retired = True if retired else False
+                monitor_item.save()
+                messages.success(request, 'Монитор добавлен')
 
 
             return HttpResponseRedirect(reverse('add_item', args=(item,)))
