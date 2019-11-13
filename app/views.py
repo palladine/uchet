@@ -1,9 +1,9 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import User, Unit, Monitor
+from .models import User, Unit, Monitor, Printer, Scanner
 from django.views import View
-from .forms import LoginForm, AddUnitForm, AddMonitorForm
+from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm
 from django.urls import reverse
 
 
@@ -77,11 +77,20 @@ class AddItem(View):
             form = AddMonitorForm()
             context.update({'title': 'Добавление монитора', 'form': form, 'item': item})
 
+        if item == 'printer':
+            form = AddPrinterForm()
+            context.update({'title': 'Добавление МФУ / принтера', 'form': form, 'item': item})
+
+        if item == 'scanner':
+            form = AddScannerForm()
+            context.update({'title': 'Добавление сканера', 'form': form, 'item': item})
+
         return render(request, 'add_item.html', context=context)
 
 
     def post(self, request, item):
-        dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST)}
+        dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
+                     'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST)}
         form = dic_forms[item]
         context = {'form': form, 'item': item}
 
@@ -118,6 +127,36 @@ class AddItem(View):
                 monitor_item.save()
                 messages.success(request, 'Монитор добавлен')
 
+
+            if item == 'printer':
+                model = request.POST.get('model')
+                id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                ip = request.POST.get('ip')
+                retired = request.POST.get('retired')
+                printer_item = Printer(model=model, id_sn=id_sn)
+                printer_item.id_naumen = id_naumen
+                printer_item.id_invent = id_invent
+                printer_item.ip = ip
+                printer_item.retired = True if retired else False
+                printer_item.save()
+                messages.success(request, 'МФУ / принтер добавлен')
+
+            if item == 'scanner':
+                model = request.POST.get('model')
+                id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                id_sn_base = request.POST.get('id_sn_base')
+                retired = request.POST.get('retired')
+                scanner_item = Scanner(model=model, id_sn=id_sn)
+                scanner_item.id_naumen = id_naumen
+                scanner_item.id_invent = id_invent
+                scanner_item.id_sn_base = id_sn_base
+                scanner_item.retired = True if retired else False
+                scanner_item.save()
+                messages.success(request, 'Сканер добавлен')
 
             return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:

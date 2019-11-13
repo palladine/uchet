@@ -10,7 +10,6 @@ class LoginForm(forms.Form):
 
 
 class AddUnitForm(forms.Form):
-
     OS_CHOICES = (
         (" ", ("")),
         ("Win XP (32)", ("Win XP (32)")),
@@ -18,7 +17,6 @@ class AddUnitForm(forms.Form):
         ("Win 7 (32)", ("Win 7 (32)")),
         ("Win 7 (64)", ("Win 7 (64)"))
     )
-
     model = forms.CharField(label='Модель', help_text=ht, max_length=255, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
     memory = forms.IntegerField(label='Память (Гб)', required=False, widget=forms.NumberInput(attrs={'class': 'form-control form-control-sm'}))
     os = forms.CharField(label='Операционная система', required=False, widget=forms.Select(choices=OS_CHOICES, attrs={'class': 'form-control form-control-sm'}))
@@ -34,3 +32,22 @@ class AddMonitorForm(forms.Form):
     id_invent = forms.CharField(label='Инвентарный номер', required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
     id_sn = forms.CharField(label='Серийный номер', help_text=ht, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
     retired = forms.BooleanField(label="Списан", required=False, widget=forms.CheckboxInput(attrs={'class': ''}))
+
+
+class AddPrinterForm(forms.Form):
+    model = forms.CharField(label='Модель', help_text=ht, max_length=255, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
+    id_naumen = forms.CharField(label='Номер в Naumen', required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    id_invent = forms.CharField(label='Инвентарный номер', required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    id_sn = forms.CharField(label='Серийный номер', help_text=ht, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
+    ip = forms.CharField(label="IP-адрес", required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    retired = forms.BooleanField(label="Списан", required=False, widget=forms.CheckboxInput(attrs={'class': ''}))
+
+
+class AddScannerForm(forms.Form):
+    model = forms.CharField(label='Модель', help_text=ht, max_length=255, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
+    id_naumen = forms.CharField(label='Номер в Naumen', required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    id_invent = forms.CharField(label='Инвентарный номер', required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    id_sn = forms.CharField(label='Серийный номер', help_text=ht, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
+    id_sn_base = forms.CharField(label="Серийный номер базы", required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+    retired = forms.BooleanField(label="Списан", required=False, widget=forms.CheckboxInput(attrs={'class': ''}))
+
