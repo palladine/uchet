@@ -1,9 +1,9 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import User, Unit, Monitor, Printer, Scanner
+from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale
 from django.views import View
-from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm
+from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm
 from django.urls import reverse
 
 
@@ -85,12 +85,21 @@ class AddItem(View):
             form = AddScannerForm()
             context.update({'title': 'Добавление сканера', 'form': form, 'item': item})
 
+        if item == 'ibp':
+            form = AddIBPForm()
+            context.update({'title': 'Добавление ИБП', 'form': form, 'item': item})
+
+        if item == 'scale':
+            form = AddScaleForm()
+            context.update({'title': 'Добавление весов', 'form': form, 'item': item})
+
         return render(request, 'add_item.html', context=context)
 
 
     def post(self, request, item):
         dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
-                     'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST)}
+                     'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST),
+                     'ibp': AddIBPForm(request.POST), 'scale': AddScaleForm}
         form = dic_forms[item]
         context = {'form': form, 'item': item}
 
@@ -143,6 +152,7 @@ class AddItem(View):
                 printer_item.save()
                 messages.success(request, 'МФУ / принтер добавлен')
 
+
             if item == 'scanner':
                 model = request.POST.get('model')
                 id_naumen = request.POST.get('id_naumen')
@@ -157,6 +167,33 @@ class AddItem(View):
                 scanner_item.retired = True if retired else False
                 scanner_item.save()
                 messages.success(request, 'Сканер добавлен')
+
+            if item == 'ibp':
+                model = request.POST.get('model')
+                id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                retired = request.POST.get('retired')
+                ibp_item = IBP(model=model, id_sn=id_sn)
+                ibp_item.id_naumen = id_naumen
+                ibp_item.id_invent = id_invent
+                ibp_item.retired = True if retired else False
+                ibp_item.save()
+                messages.success(request, 'ИБП добавлен')
+
+
+            if item == 'scale':
+                model = request.POST.get('model')
+                id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                retired = request.POST.get('retired')
+                scale_item = Scale(model=model, id_sn=id_sn)
+                scale_item.id_naumen = id_naumen
+                scale_item.id_invent = id_invent
+                scale_item.retired = True if retired else False
+                scale_item.save()
+                messages.success(request, 'Весы добавлены')
 
             return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:

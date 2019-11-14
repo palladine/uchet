@@ -47,9 +47,13 @@ body {
             border-color: rgba(144, 12, 63, .7)
         }
 
-        a:link, a:visited {
+        a, a:link, a:visited {
             text-decoration:none;
             color: rgba(144, 12, 63, .7);
+        }
+
+        a:hover {
+            color: rgba(144, 12, 63, .8)
         }
 
         .plat {
