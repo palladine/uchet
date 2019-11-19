@@ -1,9 +1,9 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale
+from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router
 from django.views import View
-from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm
+from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm
 from django.urls import reverse
 
 
@@ -93,13 +93,22 @@ class AddItem(View):
             form = AddScaleForm()
             context.update({'title': 'Добавление весов', 'form': form, 'item': item})
 
+        if item == 'phone':
+            form = AddPhoneForm()
+            context.update({'title': 'Добавление телефона', 'form': form, 'item': item})
+
+        if item == 'router':
+            form = AddRouterForm()
+            context.update({'title': 'Добавление маршрутизатора / свича', 'form': form, 'item': item})
+
         return render(request, 'add_item.html', context=context)
 
 
     def post(self, request, item):
         dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
                      'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST),
-                     'ibp': AddIBPForm(request.POST), 'scale': AddScaleForm}
+                     'ibp': AddIBPForm(request.POST), 'scale': AddScaleForm(request.POST),
+                     'phone': AddPhoneForm(request.POST), 'router': AddRouterForm(request.POST)}
         form = dic_forms[item]
         context = {'form': form, 'item': item}
 
@@ -195,6 +204,39 @@ class AddItem(View):
                 scale_item.save()
                 messages.success(request, 'Весы добавлены')
 
+
+            if item == 'phone':
+                model = request.POST.get('model')
+                #id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                ip = request.POST.get('ip')
+                retired = request.POST.get('retired')
+                phone_item = Phone(model=model, id_sn=id_sn)
+                #phone_item.id_naumen = id_naumen
+                phone_item.id_invent = id_invent
+                phone_item.ip = ip
+                phone_item.retired = True if retired else False
+                phone_item.save()
+                messages.success(request, 'Телефон добавлен')
+
+
+            if item == 'router':
+                model = request.POST.get('model')
+                #id_naumen = request.POST.get('id_naumen')
+                id_invent = request.POST.get('id_invent')
+                id_sn = request.POST.get('id_sn')
+                ip = request.POST.get('ip')
+                retired = request.POST.get('retired')
+                router_item = Router(model=model, id_sn=id_sn)
+                #router_item.id_naumen = id_naumen
+                router_item.id_invent = id_invent
+                router_item.ip = ip
+                router_item.retired = True if retired else False
+                router_item.save()
+                messages.success(request, 'Маршрутизатор / свич добавлен')
+
+
             return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:
             messages.error(request, form.errors)
@@ -205,8 +247,31 @@ class AddItem(View):
 
 
 class ShowItems(View):
+
+    def _clear(self, lst):
+        for i in range(len(lst)):
+            if lst[i] == None or lst[i] == '':
+                lst[i] = '-'
+        return lst
+
+
     def get(self, request, items):
         context = {}
+
         if items == 'units':
-            context = {'title': 'Системные блоки'}
+            all_items = Unit.objects.all()
+            vals = [self._clear(
+                [x.pk,
+                 x.model,
+                 x.memory,
+                 x.os,
+                 x.id_naumen,
+                 x.id_invent,
+                 x.id_sn,
+                 x.arm,
+                 "Да" if x.retired else "Нет"]) for x in all_items]
+            heads = [y.verbose_name for y in Unit._meta._get_fields()]
+            context.update({'title': 'Системные блоки', 'heads': heads, 'vals': vals})
+
+
         return render(request, 'show_items.html', context=context)

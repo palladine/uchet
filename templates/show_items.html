@@ -1,5 +1,49 @@
 {% extends "base.html" %}
 
 {% block content %}
-        {{ title }}
+
+
+        <div class="container-fluid">
+
+            <div class="row d-flex justify-content-center my-3">
+                <h5>{{ title }}</h5>
+            </div>
+
+
+            <div class="row d-flex justify-content-center">
+                {% if vals %}
+                <table class="table table-hover table-sm col-10">
+                      <thead>
+                        <tr>
+                          {% if heads %}
+                                <th scope="col">#</th>
+                            {% for head in heads %}
+                                <th scope="col">{{ head }}</th>
+                            {% endfor %}
+                                <th></th>
+                          {% endif%}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {% for val in vals %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            {% for v in val %}
+                                {% if forloop.counter == 2 %}
+                                    <td><a href="">{{ v }}</a></td>
+                                {% else %}
+                                    <td>{{ v }}</td>
+                                {% endif %}
+                            {% endfor %}
+
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                </table>
+                {% else %}
+
+                {% endif%}
+            </div>
+        </div>
 {% endblock %}

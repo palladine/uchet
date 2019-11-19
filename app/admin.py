@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale
+from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ['pk', 'username', 'email', 'role']
@@ -34,3 +34,13 @@ admin.site.register(IBP, IBPAdmin)
 class ScaleAdmin(admin.ModelAdmin):
     list_display = ['pk', 'model', 'id_naumen', 'id_invent', 'id_sn', 'arm', 'retired']
 admin.site.register(Scale, ScaleAdmin)
+
+
+class PhoneAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'model', 'id_invent', 'id_sn', 'arm', 'ip', 'retired']
+admin.site.register(Phone, PhoneAdmin)
+
+
+class RouterAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'model', 'id_invent', 'id_sn', 'ip', 'retired']
+admin.site.register(Router, RouterAdmin)
