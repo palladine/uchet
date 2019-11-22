@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-
         <div class="container-fluid">
-
             <div class="row d-flex justify-content-center my-3">
-                <h5>{{ title }}</h5>
+                {% if msg %}
+                        <div class="alert {% if status %} alert-{{ status }} {% endif %} col-12 col-md-6 d-flex justify-content-center" role="alert">
+                            {{ msg }}
+                        </div>
+                {% else %}
+                        <h5>{{ title }}</h5>
+                {% endif %}
             </div>
 
 

@@ -1,6 +1,5 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
 from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router
 from django.views import View
 from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm
@@ -69,6 +68,14 @@ class Home(View):
 class AddItem(View):
     def get(self, request, item):
         context = {}
+
+        status = request.session.get('status', False)
+        msg = request.session.get('msg', False)
+
+        request.session['status'] = False
+        request.session['msg'] = False
+        context.update({'status': status, 'msg': msg})
+
         if item == 'unit':
             form = AddUnitForm()
             context.update({'title': 'Добавление системного блока', 'form': form, 'item': item})
@@ -112,16 +119,18 @@ class AddItem(View):
         form = dic_forms[item]
         context = {'form': form, 'item': item}
 
+
+        # TODO Session !!! for message
         if form.is_valid():
+            model = request.POST.get('model')
+            id_naumen = request.POST.get('id_naumen')
+            id_invent = request.POST.get('id_invent')
+            id_sn = request.POST.get('id_sn')
+            retired = request.POST.get('retired')
 
             if item == 'unit':
-                model = request.POST.get('model')
                 memory = request.POST.get('memory')
                 os = request.POST.get('os')
-                id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
-                retired = request.POST.get('retired')
                 unit_item = Unit(model=model, id_sn=id_sn)
                 unit_item.memory = memory if memory else 0
                 unit_item.os = os
@@ -129,125 +138,89 @@ class AddItem(View):
                 unit_item.id_invent = id_invent
                 unit_item.retired = True if retired else False
                 unit_item.save()
-                messages.success(request, 'Системный блок добавлен')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'Системный блок добавлен'
 
             if item == 'monitor':
-                model = request.POST.get('model')
-                id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
-                retired = request.POST.get('retired')
                 monitor_item = Monitor(model=model, id_sn=id_sn)
                 monitor_item.id_naumen = id_naumen
                 monitor_item.id_invent = id_invent
                 monitor_item.retired = True if retired else False
                 monitor_item.save()
-                messages.success(request, 'Монитор добавлен')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'Монитор добавлен'
 
             if item == 'printer':
-                model = request.POST.get('model')
-                id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
                 ip = request.POST.get('ip')
-                retired = request.POST.get('retired')
                 printer_item = Printer(model=model, id_sn=id_sn)
                 printer_item.id_naumen = id_naumen
                 printer_item.id_invent = id_invent
                 printer_item.ip = ip
                 printer_item.retired = True if retired else False
                 printer_item.save()
-                messages.success(request, 'МФУ / принтер добавлен')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'МФУ / принтер добавлен'
 
             if item == 'scanner':
-                model = request.POST.get('model')
-                id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
                 id_sn_base = request.POST.get('id_sn_base')
-                retired = request.POST.get('retired')
                 scanner_item = Scanner(model=model, id_sn=id_sn)
                 scanner_item.id_naumen = id_naumen
                 scanner_item.id_invent = id_invent
                 scanner_item.id_sn_base = id_sn_base
                 scanner_item.retired = True if retired else False
                 scanner_item.save()
-                messages.success(request, 'Сканер добавлен')
+                request.session['status'] = 'success'
+                request.session['msg'] = 'Сканер добавлен'
 
             if item == 'ibp':
-                model = request.POST.get('model')
-                id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
-                retired = request.POST.get('retired')
                 ibp_item = IBP(model=model, id_sn=id_sn)
                 ibp_item.id_naumen = id_naumen
                 ibp_item.id_invent = id_invent
                 ibp_item.retired = True if retired else False
                 ibp_item.save()
-                messages.success(request, 'ИБП добавлен')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'ИБП добавлен'
 
             if item == 'scale':
-                model = request.POST.get('model')
-                id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
-                retired = request.POST.get('retired')
                 scale_item = Scale(model=model, id_sn=id_sn)
                 scale_item.id_naumen = id_naumen
                 scale_item.id_invent = id_invent
                 scale_item.retired = True if retired else False
                 scale_item.save()
-                messages.success(request, 'Весы добавлены')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'Весы добавлены'
 
             if item == 'phone':
-                model = request.POST.get('model')
-                #id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
                 ip = request.POST.get('ip')
-                retired = request.POST.get('retired')
                 phone_item = Phone(model=model, id_sn=id_sn)
                 #phone_item.id_naumen = id_naumen
                 phone_item.id_invent = id_invent
                 phone_item.ip = ip
                 phone_item.retired = True if retired else False
                 phone_item.save()
-                messages.success(request, 'Телефон добавлен')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'Телефон добавлен'
 
             if item == 'router':
-                model = request.POST.get('model')
-                #id_naumen = request.POST.get('id_naumen')
-                id_invent = request.POST.get('id_invent')
-                id_sn = request.POST.get('id_sn')
                 ip = request.POST.get('ip')
-                retired = request.POST.get('retired')
                 router_item = Router(model=model, id_sn=id_sn)
                 #router_item.id_naumen = id_naumen
                 router_item.id_invent = id_invent
                 router_item.ip = ip
                 router_item.retired = True if retired else False
                 router_item.save()
-                messages.success(request, 'Маршрутизатор / свич добавлен')
-
+                request.session['status'] = 'success'
+                request.session['msg'] = 'Маршрутизатор / свич добавлен'
 
             return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:
-            messages.error(request, form.errors)
+            request.session['status'] = 'danger'
+            request.session['msg'] = form.errors
         return render(request, 'add_item.html', context=context)
 
 
 
-
-
 class ShowItems(View):
-
     def _clear(self, lst):
         for i in range(len(lst)):
             if lst[i] == None or lst[i] == '':
@@ -257,21 +230,143 @@ class ShowItems(View):
 
     def get(self, request, items):
         context = {}
-
         if items == 'units':
             all_items = Unit.objects.all()
-            vals = [self._clear(
-                [x.pk,
-                 x.model,
-                 x.memory,
-                 x.os,
-                 x.id_naumen,
-                 x.id_invent,
-                 x.id_sn,
-                 x.arm,
-                 "Да" if x.retired else "Нет"]) for x in all_items]
-            heads = [y.verbose_name for y in Unit._meta._get_fields()]
-            context.update({'title': 'Системные блоки', 'heads': heads, 'vals': vals})
+            if all_items:
+                # pk, model, memory, os, id_naumen, id_invent, id_sn, arm, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.memory,
+                     x.os,
+                     x.id_naumen,
+                     x.id_invent,
+                     x.id_sn,
+                     x.arm,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Unit._meta._get_fields()]
+                context.update({'title': 'Системные блоки', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Системные блоки" пуст.'})
 
+        if items == 'monitors':
+            all_items = Monitor.objects.all()
+            if all_items:
+                # pk, model, id_naumen, id_invent, id_sn, arm, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_naumen,
+                     x.id_invent,
+                     x.id_sn,
+                     x.arm,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Monitor._meta._get_fields()]
+                context.update({'title': 'Мониторы', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Мониторы" пуст.'})
+
+        if items == 'printers':
+            all_items = Printer.objects.all()
+            if all_items:
+                # pk, model, id_naumen, id_invent, id_sn, arm, ip, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_naumen,
+                     x.id_invent,
+                     x.id_sn,
+                     x.arm,
+                     x.ip,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Printer._meta._get_fields()]
+                context.update({'title': 'Принтеры', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Принтеры" пуст.'})
+
+        if items == 'scanners':
+            all_items = Scanner.objects.all()
+            if all_items:
+                # pk, model, id_naumen, id_invent, id_sn, id_sn_base, arm, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_naumen,
+                     x.id_invent,
+                     x.id_sn,
+                     x.id_sn_base,
+                     x.arm,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Scanner._meta._get_fields()]
+                context.update({'title': 'Сканеры', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Сканеры" пуст.'})
+
+        if items == 'ibps':
+            all_items = IBP.objects.all()
+            if all_items:
+                # pk, model, id_naumen, id_invent, id_sn, arm, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_naumen,
+                     x.id_invent,
+                     x.id_sn,
+                     x.arm,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in IBP._meta._get_fields()]
+                context.update({'title': 'ИБП', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "ИБП" пуст.'})
+
+        if items == 'phones':
+            all_items = Phone.objects.all()
+            if all_items:
+                # pk, model, id_invent, id_sn, arm, ip, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_invent,
+                     x.id_sn,
+                     x.arm,
+                     x.ip,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Phone._meta._get_fields()]
+                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Телефоны" пуст.'})
+
+        if items == 'routers':
+            all_items = Router.objects.all()
+            if all_items:
+                # pk, model, id_invent, id_sn, ip, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_invent,
+                     x.id_sn,
+                     x.ip,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Router._meta._get_fields()]
+                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Маршрутизаторы / свичи" пуст.'})
+
+        if items == 'scales':
+            all_items = Scale.objects.all()
+            if all_items:
+                # pk, model, id_naumen, id_invent, id_sn, arm, retired
+                vals = [self._clear(
+                    [x.pk,
+                     x.model,
+                     x.id_naumen,
+                     x.id_invent,
+                     x.id_sn,
+                     x.arm,
+                     "Да" if x.retired else "Нет"]) for x in all_items]
+                heads = [y.verbose_name for y in Scale._meta._get_fields()]
+                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "Весы" пуст.'})
 
         return render(request, 'show_items.html', context=context)
