@@ -10,9 +10,23 @@ class User(AbstractUser):
 
 
 class ARM(models.Model):
-    # ip = models.CharField(max_length=100, null=True, blank=True, verbose_name="IP-адрес")
-    # computer_name = models.CharField(max_length=100, null=True, blank=True, verbose_name="Имя компьютера")
-    ...
+    unit_arm = models.ForeignKey("Unit", default='', on_delete=models.CASCADE, null=False, blank=False, related_name='unit_arm_id', verbose_name="Системный блок")
+    monitor_arm = models.ForeignKey("Monitor", default='', on_delete=models.CASCADE, null=False, blank=False, related_name='monitor_arm_id', verbose_name="Монитор")
+    printer_arm = models.ForeignKey("Printer", on_delete=models.SET_NULL, null=True, blank=True, related_name='printer_arm_id', verbose_name="Принтер")
+    scanner_arm = models.ForeignKey("Scanner", on_delete=models.SET_NULL, null=True, blank=True, related_name='scanner_arm_id', verbose_name="Сканер")
+    ibp_arm = models.ForeignKey("IBP", on_delete=models.SET_NULL, null=True, blank=True, related_name='ibp_arm_id', verbose_name="ИБП")
+    scale_arm = models.ForeignKey("Scale", on_delete=models.SET_NULL, null=True, blank=True, related_name='scale_arm_id', verbose_name="Весы")
+    phone_arm = models.ForeignKey("Phone", on_delete=models.SET_NULL, null=True, blank=True, related_name='phone_arm_id', verbose_name="Телефон")
+    comp_name = models.CharField(max_length=100, null=True, blank=True, verbose_name="Имя компьютера")
+    ip = models.CharField(max_length=100, null=True, blank=True, verbose_name="IP-адрес")
+    comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")
+
+    class Meta:
+        verbose_name = "АРМ"
+        verbose_name_plural = "АРМы"
+
+    def __str__(self):
+        return "[{0}] {1}({2}/{3})".format(self.pk, self.unit_arm, self.comp_name, self.ip)
 
 
 class Unit(models.Model):
@@ -30,7 +44,7 @@ class Unit(models.Model):
         verbose_name_plural = "Системные блоки"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class Monitor(models.Model):
@@ -46,7 +60,7 @@ class Monitor(models.Model):
         verbose_name_plural = "Мониторы"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class Printer(models.Model):
@@ -64,7 +78,7 @@ class Printer(models.Model):
         verbose_name_plural = "МФУ / Принтеры"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class Scanner(models.Model):
@@ -81,7 +95,7 @@ class Scanner(models.Model):
         verbose_name_plural = "Сканеры"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class IBP(models.Model):
@@ -97,7 +111,7 @@ class IBP(models.Model):
         verbose_name_plural = "ИБП"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class Scale(models.Model):
@@ -113,7 +127,7 @@ class Scale(models.Model):
         verbose_name_plural = "Весы"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class Phone(models.Model):
@@ -130,7 +144,7 @@ class Phone(models.Model):
         verbose_name_plural = "Телефоны"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)
 
 
 class Router(models.Model):
@@ -147,4 +161,4 @@ class Router(models.Model):
         verbose_name_plural = "Маршрутизаторы / Свичи"
 
     def __str__(self):
-        return "{0}-{1}".format(self.pk, self.model)
+        return "[{0}] {1}".format(self.pk, self.model)

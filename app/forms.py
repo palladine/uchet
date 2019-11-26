@@ -1,5 +1,5 @@
 from django import forms
-
+from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router
 
 ht = '* Поле обязательное для заполнения'
 
@@ -84,3 +84,22 @@ class AddRouterForm(forms.Form):
     id_sn = forms.CharField(label='Серийный номер', help_text=ht, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm required'}))
     ip = forms.CharField(label="IP-адрес", required=False, widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
     retired = forms.BooleanField(label="Списан", required=False, widget=forms.CheckboxInput(attrs={'class': ''}))
+
+
+class AddARMForm(forms.Form):
+    # todo objects.all() ---> filter(arm=False and arm= None)
+    #unit_arm = forms.CharField(label='Системный блок', required=True, help_text=ht,
+    #                             widget=forms.Select(choices=[(x.pk, "[sn: {0}] {1}".format(x.id_sn, x.model)) for x in Unit.objects.all()],
+    #                                                 attrs={'class': 'form-control form-control-sm'}))
+    unit_arm = forms.ModelChoiceField(label='Системный блок',
+                                      required=True,
+                                      help_text=ht,
+                                      queryset=Unit.objects.all(),
+                                      widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+
+    monitor_arm = forms.ModelChoiceField(label='Монитор',
+                                      required=True,
+                                      help_text=ht,
+                                      queryset=Monitor.objects.all(),
+                                      widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+

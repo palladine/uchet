@@ -1,8 +1,8 @@
 from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router
+from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router, ARM
 from django.views import View
-from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm
+from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm, AddARMForm
 from django.urls import reverse
 
 
@@ -108,6 +108,10 @@ class AddItem(View):
             form = AddRouterForm()
             context.update({'title': 'Добавление маршрутизатора / свича', 'form': form, 'item': item})
 
+        if item == 'arm':
+            form = AddARMForm()
+            context.update({'title': 'Добавление АРМ', 'form': form, 'item': item})
+
         return render(request, 'add_item.html', context=context)
 
 
@@ -115,12 +119,12 @@ class AddItem(View):
         dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
                      'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST),
                      'ibp': AddIBPForm(request.POST), 'scale': AddScaleForm(request.POST),
-                     'phone': AddPhoneForm(request.POST), 'router': AddRouterForm(request.POST)}
+                     'phone': AddPhoneForm(request.POST), 'router': AddRouterForm(request.POST),
+                     'arm': AddARMForm(request.POST)}
         form = dic_forms[item]
         context = {'form': form, 'item': item}
 
 
-        # TODO Session !!! for message
         if form.is_valid():
             model = request.POST.get('model')
             id_naumen = request.POST.get('id_naumen')
@@ -212,6 +216,17 @@ class AddItem(View):
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Маршрутизатор / свич добавлен'
 
+            if item == 'arm':
+                unit_arm_id = request.POST.get('unit_arm')
+                monitor_arm_id = request.POST.get('monitor_arm')
+                arm_item = ARM()
+                arm_item.unit_arm = Unit.objects.get(pk=unit_arm_id)
+                arm_item.monitor_arm = Monitor.objects.get(pk=monitor_arm_id)
+                # todo save arm field in Unit and Monitor items
+                arm_item.save()
+                request.session['status'] = 'success'
+                request.session['msg'] = 'АРМ добавлено'
+
             return HttpResponseRedirect(reverse('add_item', args=(item,)))
         else:
             request.session['status'] = 'danger'
@@ -244,7 +259,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Unit._meta._get_fields()]
+                heads = [y.verbose_name for y in Unit._meta._get_fields()[1:]]
                 context.update({'title': 'Системные блоки', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Системные блоки" пуст.'})
@@ -261,7 +276,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Monitor._meta._get_fields()]
+                heads = [y.verbose_name for y in Monitor._meta._get_fields()[1:]]
                 context.update({'title': 'Мониторы', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Мониторы" пуст.'})
@@ -279,7 +294,7 @@ class ShowItems(View):
                      x.arm,
                      x.ip,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Printer._meta._get_fields()]
+                heads = [y.verbose_name for y in Printer._meta._get_fields()[1:]]
                 context.update({'title': 'Принтеры', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Принтеры" пуст.'})
@@ -297,7 +312,7 @@ class ShowItems(View):
                      x.id_sn_base,
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Scanner._meta._get_fields()]
+                heads = [y.verbose_name for y in Scanner._meta._get_fields()[1:]]
                 context.update({'title': 'Сканеры', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Сканеры" пуст.'})
@@ -314,7 +329,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in IBP._meta._get_fields()]
+                heads = [y.verbose_name for y in IBP._meta._get_fields()[1:]]
                 context.update({'title': 'ИБП', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "ИБП" пуст.'})
@@ -331,7 +346,7 @@ class ShowItems(View):
                      x.arm,
                      x.ip,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Phone._meta._get_fields()]
+                heads = [y.verbose_name for y in Phone._meta._get_fields()[1:]]
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Телефоны" пуст.'})
@@ -364,7 +379,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Scale._meta._get_fields()]
+                heads = [y.verbose_name for y in Scale._meta._get_fields()[1:]]
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Весы" пуст.'})
