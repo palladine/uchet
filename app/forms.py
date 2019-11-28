@@ -1,7 +1,13 @@
 from django import forms
 from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router
+from django.db.models import Q
 
 ht = '* Поле обязательное для заполнения'
+
+
+class LabelModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "[sn: {0}] {1}".format(obj.id_sn, obj.model)
 
 
 class LoginForm(forms.Form):
@@ -87,19 +93,41 @@ class AddRouterForm(forms.Form):
 
 
 class AddARMForm(forms.Form):
-    # todo objects.all() ---> filter(arm=False and arm= None)
-    #unit_arm = forms.CharField(label='Системный блок', required=True, help_text=ht,
-    #                             widget=forms.Select(choices=[(x.pk, "[sn: {0}] {1}".format(x.id_sn, x.model)) for x in Unit.objects.all()],
-    #                                                 attrs={'class': 'form-control form-control-sm'}))
-    unit_arm = forms.ModelChoiceField(label='Системный блок',
+    unit_arm = LabelModelChoiceField(label='Системный блок',
                                       required=True,
                                       help_text=ht,
-                                      queryset=Unit.objects.all(),
+                                      queryset=Unit.objects.filter(Q(arm=False) | Q(arm=None)),
+                                      empty_label=None,
                                       widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
-    monitor_arm = forms.ModelChoiceField(label='Монитор',
-                                      required=True,
-                                      help_text=ht,
-                                      queryset=Monitor.objects.all(),
-                                      widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+    monitor_arm = LabelModelChoiceField(label='Монитор',
+                                        required=True,
+                                        help_text=ht,
+                                        queryset=Monitor.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label=None,
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
+    printer_arm = LabelModelChoiceField(label='МФУ / Принтер',
+                                        queryset=Printer.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label="",
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+
+    scanner_arm = LabelModelChoiceField(label='Сканер',
+                                        queryset=Scanner.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label="",
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+
+    ibp_arm = LabelModelChoiceField(label='ИБП',
+                                        queryset=IBP.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label="",
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+
+    scale_arm = LabelModelChoiceField(label='Весы',
+                                    queryset=Scale.objects.filter(Q(arm=False) | Q(arm=None)),
+                                    empty_label="",
+                                    widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+
+    phone_arm = LabelModelChoiceField(label='Телефон',
+                                      queryset=Phone.objects.filter(Q(arm=False) | Q(arm=None)),
+                                      empty_label="",
+                                      widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))

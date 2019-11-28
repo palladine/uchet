@@ -16,7 +16,7 @@
             </div>
 
             <div class="row d-flex justify-content-center">
-                 <form action="{% url 'add_item' item %}" method="post" class="col-7 col-md-4" style="max-width: 430px">
+                 <form action="{% url 'add_item' item %}" method="post" class="" style="width: 400px">
                      {% csrf_token %}
                      {% for field in form %}
                      <div class="mt-3">
