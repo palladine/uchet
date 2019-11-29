@@ -7,7 +7,7 @@ ht = '* Поле обязательное для заполнения'
 
 class LabelModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return "[sn: {0}] {1}".format(obj.id_sn, obj.model)
+        return "{0} [sn: {1}]".format(obj.model, obj.id_sn)
 
 
 class LoginForm(forms.Form):
@@ -94,11 +94,11 @@ class AddRouterForm(forms.Form):
 
 class AddARMForm(forms.Form):
     unit_arm = LabelModelChoiceField(label='Системный блок',
-                                      required=True,
-                                      help_text=ht,
-                                      queryset=Unit.objects.filter(Q(arm=False) | Q(arm=None)),
-                                      empty_label=None,
-                                      widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+                                        required=True,
+                                        help_text=ht,
+                                        queryset=Unit.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label=None,
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     monitor_arm = LabelModelChoiceField(label='Монитор',
                                         required=True,
@@ -108,26 +108,31 @@ class AddARMForm(forms.Form):
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     printer_arm = LabelModelChoiceField(label='МФУ / Принтер',
+                                        required=False,
                                         queryset=Printer.objects.filter(Q(arm=False) | Q(arm=None)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     scanner_arm = LabelModelChoiceField(label='Сканер',
+                                        required=False,
                                         queryset=Scanner.objects.filter(Q(arm=False) | Q(arm=None)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     ibp_arm = LabelModelChoiceField(label='ИБП',
+                                        required=False,
                                         queryset=IBP.objects.filter(Q(arm=False) | Q(arm=None)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     scale_arm = LabelModelChoiceField(label='Весы',
-                                    queryset=Scale.objects.filter(Q(arm=False) | Q(arm=None)),
-                                    empty_label="",
-                                    widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+                                        required=False,
+                                        queryset=Scale.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label="",
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     phone_arm = LabelModelChoiceField(label='Телефон',
-                                      queryset=Phone.objects.filter(Q(arm=False) | Q(arm=None)),
-                                      empty_label="",
-                                      widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+                                        required=False,
+                                        queryset=Phone.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        empty_label="",
+                                        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))

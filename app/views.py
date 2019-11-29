@@ -216,13 +216,48 @@ class AddItem(View):
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Маршрутизатор / свич добавлен'
 
+
+            # adding ARM
+            # todo field scan-code to model + creating scan-code to arm!
+
             if item == 'arm':
                 unit_arm_id = request.POST.get('unit_arm')
                 monitor_arm_id = request.POST.get('monitor_arm')
+                printer_arm_id = request.POST.get('printer_arm')
+                scanner_arm_id = request.POST.get('scanner_arm')
+                ibp_arm_id = request.POST.get('ibp_arm')
+                scale_arm_id = request.POST.get('scale_arm')
+                phone_arm_id = request.POST.get('phone_arm')
+
                 arm_item = ARM()
+
                 arm_item.unit_arm = Unit.objects.get(pk=unit_arm_id)
                 arm_item.monitor_arm = Monitor.objects.get(pk=monitor_arm_id)
+                arm_item.save()
+                print(arm_item.pk)
+
+                un = Unit.objects.get(pk=unit_arm_id)
+                un.arm = ARM.objects.get(pk=arm_item.pk)
+                un.save()
+
                 # todo save arm field in Unit and Monitor items
+                if printer_arm_id:
+                    arm_item.printer_arm = Printer.objects.get(pk=printer_arm_id)
+
+                if scanner_arm_id:
+                    arm_item.scanner_arm = Scanner.objects.get(pk=scanner_arm_id)
+
+                if ibp_arm_id:
+                    arm_item.ibp_arm = IBP.objects.get(pk=ibp_arm_id)
+
+                if scale_arm_id:
+                    arm_item.scale_arm = Scale.objects.get(pk=scale_arm_id)
+
+                if phone_arm_id:
+                    arm_item.phone_arm = Phone.objects.get(pk=phone_arm_id)
+
+
+
                 arm_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'АРМ добавлено'
