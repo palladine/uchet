@@ -96,43 +96,52 @@ class AddARMForm(forms.Form):
     unit_arm = LabelModelChoiceField(label='Системный блок',
                                         required=True,
                                         help_text=ht,
-                                        queryset=Unit.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=Unit.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label=None,
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     monitor_arm = LabelModelChoiceField(label='Монитор',
                                         required=True,
                                         help_text=ht,
-                                        queryset=Monitor.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=Monitor.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label=None,
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     printer_arm = LabelModelChoiceField(label='МФУ / Принтер',
                                         required=False,
-                                        queryset=Printer.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=Printer.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     scanner_arm = LabelModelChoiceField(label='Сканер',
                                         required=False,
-                                        queryset=Scanner.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=Scanner.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     ibp_arm = LabelModelChoiceField(label='ИБП',
                                         required=False,
-                                        queryset=IBP.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=IBP.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     scale_arm = LabelModelChoiceField(label='Весы',
                                         required=False,
-                                        queryset=Scale.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=Scale.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
 
     phone_arm = LabelModelChoiceField(label='Телефон',
                                         required=False,
-                                        queryset=Phone.objects.filter(Q(arm=False) | Q(arm=None)),
+                                        queryset=Phone.objects.filter((Q(arm=False) | Q(arm=None)) & Q(retired=False)),
                                         empty_label="",
                                         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}))
+
+    comp_name_arm = forms.CharField(label='Имя компьютера', required=False,
+                                    widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+
+    ip_arm = forms.CharField(label="IP-адрес", required=False,
+                         widget=forms.TextInput(attrs={'class': 'form-control form-control-sm'}))
+
+    comment_arm = forms.CharField(label='Комментарии', required=False,
+                                  widget=forms.Textarea(attrs={'class': 'form-control form-control-sm'}))

@@ -219,7 +219,6 @@ class AddItem(View):
 
             # adding ARM
             # todo field scan-code to model + creating scan-code to arm!
-
             if item == 'arm':
                 unit_arm_id = request.POST.get('unit_arm')
                 monitor_arm_id = request.POST.get('monitor_arm')
@@ -228,35 +227,66 @@ class AddItem(View):
                 ibp_arm_id = request.POST.get('ibp_arm')
                 scale_arm_id = request.POST.get('scale_arm')
                 phone_arm_id = request.POST.get('phone_arm')
+                comp_name_arm = request.POST.get('comp_name_arm')
+                ip_arm = request.POST.get('ip_arm')
+                comment_arm = request.POST.get('comment_arm')
 
+                # creating new arm
                 arm_item = ARM()
 
-                arm_item.unit_arm = Unit.objects.get(pk=unit_arm_id)
-                arm_item.monitor_arm = Monitor.objects.get(pk=monitor_arm_id)
+                ## required unit and monitor objects
+                unit_obj = Unit.objects.get(pk=unit_arm_id)
+                monitor_obj = Monitor.objects.get(pk=monitor_arm_id)
+
+                arm_item.unit_arm = unit_obj
+                arm_item.monitor_arm = monitor_obj
+
+                arm_item.comp_name = comp_name_arm
+                arm_item.ip = ip_arm
+                arm_item.comment = comment_arm
+
                 arm_item.save()
-                print(arm_item.pk)
 
-                un = Unit.objects.get(pk=unit_arm_id)
-                un.arm = ARM.objects.get(pk=arm_item.pk)
-                un.save()
+                # new arm object
+                arm_obj = ARM.objects.get(pk=arm_item.pk)
 
-                # todo save arm field in Unit and Monitor items
+                # adding new arm to unit
+                unit_obj.arm = arm_obj
+                unit_obj.save()
+
+                # adding new arm to monitor
+                monitor_obj.arm = arm_obj
+                monitor_obj.save()
+
                 if printer_arm_id:
-                    arm_item.printer_arm = Printer.objects.get(pk=printer_arm_id)
+                    printer_obj = Printer.objects.get(pk=printer_arm_id)
+                    arm_item.printer_arm = printer_obj
+                    printer_obj.arm = arm_obj
+                    printer_obj.save()
 
                 if scanner_arm_id:
-                    arm_item.scanner_arm = Scanner.objects.get(pk=scanner_arm_id)
+                    scanner_obj = Scanner.objects.get(pk=scanner_arm_id)
+                    arm_item.scanner_arm = scanner_obj
+                    scanner_obj.arm = arm_obj
+                    scanner_obj.save()
 
                 if ibp_arm_id:
-                    arm_item.ibp_arm = IBP.objects.get(pk=ibp_arm_id)
+                    ibp_obj = IBP.objects.get(pk=ibp_arm_id)
+                    arm_item.ibp_arm = ibp_obj
+                    ibp_obj.arm = arm_obj
+                    ibp_obj.save()
 
                 if scale_arm_id:
-                    arm_item.scale_arm = Scale.objects.get(pk=scale_arm_id)
+                    scale_obj = Scale.objects.get(pk=scale_arm_id)
+                    arm_item.scale_arm = scale_obj
+                    scale_obj.arm = arm_obj
+                    scale_obj.save()
 
                 if phone_arm_id:
-                    arm_item.phone_arm = Phone.objects.get(pk=phone_arm_id)
-
-
+                    phone_obj = Phone.objects.get(pk=phone_arm_id)
+                    arm_item.phone_arm = phone_obj
+                    phone_obj.arm = arm_obj
+                    phone_obj.save()
 
                 arm_item.save()
                 request.session['status'] = 'success'
@@ -418,5 +448,29 @@ class ShowItems(View):
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Весы" пуст.'})
+
+        if items == 'arms':
+            all_items = ARM.objects.all()
+            if all_items:
+                # pk, unit_arm, monitor_arm, printer_arm, scanner_arm, ibp_arm, scale_arm, phone_arm, comp_name, ip, comment
+                vals = [self._clear(
+                    [x.pk,
+                     x.unit_arm,
+                     x.monitor_arm,
+                     x.printer_arm,
+                     x.scanner_arm,
+                     x.ibp_arm,
+                     x.scale_arm,
+                     x.phone_arm,
+                     x.comp_name,
+                     x.ip,
+                     x.comment,
+                     ]) for x in all_items]
+                #print(ARM._meta._get_fields())
+                heads = [y.verbose_name for y in ARM._meta._get_fields()[7:]]
+                #heads = ['1', '2']
+                context.update({'title': 'АРМы', 'heads': heads, 'vals': vals})
+            else:
+                context.update({'status': 'danger', 'msg': 'Список "АРМы" пуст.'})
 
         return render(request, 'show_items.html', context=context)

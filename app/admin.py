@@ -46,5 +46,5 @@ class RouterAdmin(admin.ModelAdmin):
 admin.site.register(Router, RouterAdmin)
 
 class ARMAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'unit_arm', 'monitor_arm']
+    list_display = ['pk', 'unit_arm', 'monitor_arm', 'comp_name', 'ip', 'comment']
 admin.site.register(ARM, ARMAdmin)
