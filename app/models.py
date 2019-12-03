@@ -26,7 +26,7 @@ class ARM(models.Model):
         verbose_name_plural = "АРМы"
 
     def __str__(self):
-        return "[{0}] {1}({2}/{3})".format(self.pk, self.unit_arm, self.comp_name, self.ip)
+        return "{0}({1}/{2})".format(self.unit_arm, self.comp_name, self.ip)
 
 
 class Unit(models.Model):
@@ -44,7 +44,7 @@ class Unit(models.Model):
         verbose_name_plural = "Системные блоки"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class Monitor(models.Model):
@@ -60,7 +60,7 @@ class Monitor(models.Model):
         verbose_name_plural = "Мониторы"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class Printer(models.Model):
@@ -78,7 +78,7 @@ class Printer(models.Model):
         verbose_name_plural = "МФУ / Принтеры"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class Scanner(models.Model):
@@ -95,7 +95,7 @@ class Scanner(models.Model):
         verbose_name_plural = "Сканеры"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class IBP(models.Model):
@@ -111,7 +111,7 @@ class IBP(models.Model):
         verbose_name_plural = "ИБП"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class Scale(models.Model):
@@ -127,7 +127,7 @@ class Scale(models.Model):
         verbose_name_plural = "Весы"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class Phone(models.Model):
@@ -144,7 +144,7 @@ class Phone(models.Model):
         verbose_name_plural = "Телефоны"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)
 
 
 class Router(models.Model):
@@ -161,4 +161,4 @@ class Router(models.Model):
         verbose_name_plural = "Маршрутизаторы / Свичи"
 
     def __str__(self):
-        return "[{0}] {1}".format(self.pk, self.model)
+        return "{}".format(self.model)

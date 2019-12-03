@@ -15,7 +15,7 @@ Including another URLconf
 """
 
 from django.urls import path, include
-from app.views import UserLoginRegistration, UserLogout, Home, ShowItems, AddItem
+from .views import UserLoginRegistration, UserLogout, Home, ShowItems, AddItem, CardItem
 
 
 urlpatterns = [
@@ -24,4 +24,5 @@ urlpatterns = [
     path('home', Home.as_view(), name='home'),
     path('show_<str:items>', ShowItems.as_view(), name='show_items'),
     path('add_<str:item>', AddItem.as_view(), name='add_item'),
+    path('card_<str:item>_<str:id>', CardItem.as_view(), name='card_item'),
 ]

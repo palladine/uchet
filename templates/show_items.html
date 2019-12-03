@@ -33,8 +33,12 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             {% for v in val %}
-                                {% if forloop.counter == 2 %}
-                                    <td><a href="">{{ v }}</a></td>
+                                {% if forloop.counter == 1 %}
+                                    {% if item == 'arm' %}
+                                        <td><a href="{% url 'card_item' item v %}">{{ v }}</a></td>
+                                    {% else %}
+                                        <td>{{ v }}</td>
+                                    {% endif %}
                                 {% else %}
                                     <td>{{ v }}</td>
                                 {% endif %}
