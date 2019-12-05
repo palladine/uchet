@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container-fluid">
+            <div class="row d-flex justify-content-center my-3">
+                        <div class="col-10 my-1">
+                            {% if arms %}
+                            <div>Поиск по АРМам:</div>
+                                {% for arm in arms %}
+                                    <div class="ml-5">
+                                        {{ arm }}
+                                    </div>
+                                {% endfor %}
+                            {% endif%}
+                        </div>
+
+                        <div class="col-10 my-1">
+                            {% if units %}
+                            <div>Поиск по системным блокам:</div>
+                                {% for unit in units %}
+                                    <div class="ml-5">
+                                        {{ unit.pk }}
+                                        {{ unit.model }}
+                                        {{ unit.id_naumen }}
+                                        {{ unit.id_invent }}
+                                        {{ unit.id_sn }}
+                                        {{ unit.arm }}
+                                        {{ unit.retired }}
+                                    </div>
+                                {% endfor %}
+                            {% endif%}
+                        </div>
+
+                        <div class="col-10 my-1">
+                        {% if monitors %}
+                            <div>Поиск по мониторам:</div>
+                            {% for monitor in monitors %}
+                                <div class="ml-5">
+                                    {{ monitor }}
+                                </div>
+                            {% endfor %}
+                        {% endif%}
+                        </div>
+
+            </div>
+    </div>
+{% endblock %}

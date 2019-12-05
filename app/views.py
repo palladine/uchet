@@ -4,6 +4,7 @@ from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Ro
 from django.views import View
 from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm, AddARMForm
 from django.urls import reverse
+from django.db.models import Q
 
 
 
@@ -53,8 +54,6 @@ class UserLogout(View):
         return HttpResponseRedirect(reverse('login'))
 
 
-
-
 class Home(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -63,6 +62,21 @@ class Home(View):
             return render(request, 'home.html', context=context)
         else:
             return HttpResponseRedirect(reverse('login'))
+
+
+class Search(View):
+    def get(self, request):
+        # todo audit
+        num = request.GET.get('search')
+
+        arms_s = ARM.objects.filter(pk=num)
+        units_s = Unit.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+        monitors_s = Monitor.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+        # todo other items
+
+        context = {'arms': arms_s, 'units': units_s, 'monitors': monitors_s}
+        return render(request, 'search.html', context=context)
+
 
 
 class AddItem(View):
