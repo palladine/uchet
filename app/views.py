@@ -66,15 +66,31 @@ class Home(View):
 
 class Search(View):
     def get(self, request):
-        # todo audit
+        context = {}
+        audit = request.GET.get('audit', '') == 'on'
+
         num = request.GET.get('search')
-
         arms_s = ARM.objects.filter(pk=num)
-        units_s = Unit.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-        monitors_s = Monitor.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-        # todo other items
+        if audit:
+            # todo num for pk to num for barcode!
+            printers_s = Printer.objects.filter(Q(pk=num))
+            ibps_s = IBP.objects.filter(Q(pk=num))
+            scanners_s = Scanner.objects.filter(Q(pk=num))
+            scales_s = Scale.objects.filter(Q(pk=num))
+            context.update({'arms': arms_s, 'printers': printers_s, 'ibps': ibps_s, 'scanners': scanners_s, 'scales': scales_s})
+        else:
+            units_s = Unit.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            monitors_s = Monitor.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            printers_s = Printer.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            ibps_s = IBP.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            scanners_s = Scanner.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            scales_s = Scale.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            phones_s = Phone.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            routers_s = Router.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
 
-        context = {'arms': arms_s, 'units': units_s, 'monitors': monitors_s}
+            context.update({'arms': arms_s, 'units': units_s, 'monitors': monitors_s, 'printers': printers_s,
+                            'ibps': ibps_s, 'scanners': scanners_s, 'scales': scales_s, 'phones': phones_s,
+                            'routers': routers_s})
         return render(request, 'search.html', context=context)
 
 
