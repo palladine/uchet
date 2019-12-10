@@ -79,7 +79,7 @@ body {
             box-shadow: none !important;
         }
 
-        .login {
+        .login, .search_title {
             color: rgba(144, 12, 63, .7)
         }
 

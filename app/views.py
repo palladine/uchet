@@ -57,8 +57,7 @@ class UserLogout(View):
 class Home(View):
     def get(self, request):
         if request.user.is_authenticated:
-            context = {'user': request.user, 'title': 'Главная'}
-
+            context = {'user': request.user, 'title': 'Главная', 'role': request.user.role}
             return render(request, 'home.html', context=context)
         else:
             return HttpResponseRedirect(reverse('login'))
@@ -70,23 +69,24 @@ class Search(View):
         audit = request.GET.get('audit', '') == 'on'
 
         num = request.GET.get('search')
-        arms_s = ARM.objects.filter(pk=num)
+
         if audit:
-            # todo num for pk to num for barcode!
-            printers_s = Printer.objects.filter(Q(pk=num))
-            ibps_s = IBP.objects.filter(Q(pk=num))
-            scanners_s = Scanner.objects.filter(Q(pk=num))
-            scales_s = Scale.objects.filter(Q(pk=num))
+            arms_s = ARM.objects.filter(Q(barcode_id=num))
+            printers_s = Printer.objects.filter(Q(barcode_id=num))
+            ibps_s = IBP.objects.filter(Q(barcode_id=num))
+            scanners_s = Scanner.objects.filter(Q(barcode_id=num))
+            scales_s = Scale.objects.filter(Q(barcode_id=num))
             context.update({'arms': arms_s, 'printers': printers_s, 'ibps': ibps_s, 'scanners': scanners_s, 'scales': scales_s})
         else:
+            arms_s = ARM.objects.filter(Q(pk=num) | Q(barcode_id=num))
             units_s = Unit.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
             monitors_s = Monitor.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-            printers_s = Printer.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-            ibps_s = IBP.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-            scanners_s = Scanner.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-            scales_s = Scale.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-            phones_s = Phone.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
-            routers_s = Router.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num))
+            printers_s = Printer.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num) | Q(barcode_id=num))
+            ibps_s = IBP.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num) | Q(barcode_id=num))
+            scanners_s = Scanner.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num) | Q(barcode_id=num))
+            scales_s = Scale.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num) | Q(barcode_id=num))
+            phones_s = Phone.objects.filter(Q(pk=num) | Q(id_naumen=num) | Q(id_invent=num) | Q(id_sn=num) | Q(barcode_id=num))
+            routers_s = Router.objects.filter(Q(pk=num) | Q(id_invent=num) | Q(id_sn=num))
 
             context.update({'arms': arms_s, 'units': units_s, 'monitors': monitors_s, 'printers': printers_s,
                             'ibps': ibps_s, 'scanners': scanners_s, 'scales': scales_s, 'phones': phones_s,
@@ -97,52 +97,55 @@ class Search(View):
 
 class AddItem(View):
     def get(self, request, item):
-        context = {}
+        if request.user.role == '1':
+            context = {}
 
-        status = request.session.get('status', False)
-        msg = request.session.get('msg', False)
+            status = request.session.get('status', False)
+            msg = request.session.get('msg', False)
 
-        request.session['status'] = False
-        request.session['msg'] = False
-        context.update({'status': status, 'msg': msg})
+            request.session['status'] = False
+            request.session['msg'] = False
+            context.update({'status': status, 'msg': msg})
 
-        if item == 'unit':
-            form = AddUnitForm()
-            context.update({'title': 'Добавление системного блока', 'form': form, 'item': item})
+            if item == 'unit':
+                form = AddUnitForm()
+                context.update({'title': 'Добавление системного блока', 'form': form, 'item': item})
 
-        if item == 'monitor':
-            form = AddMonitorForm()
-            context.update({'title': 'Добавление монитора', 'form': form, 'item': item})
+            if item == 'monitor':
+                form = AddMonitorForm()
+                context.update({'title': 'Добавление монитора', 'form': form, 'item': item})
 
-        if item == 'printer':
-            form = AddPrinterForm()
-            context.update({'title': 'Добавление МФУ / принтера', 'form': form, 'item': item})
+            if item == 'printer':
+                form = AddPrinterForm()
+                context.update({'title': 'Добавление МФУ / принтера', 'form': form, 'item': item})
 
-        if item == 'scanner':
-            form = AddScannerForm()
-            context.update({'title': 'Добавление сканера', 'form': form, 'item': item})
+            if item == 'scanner':
+                form = AddScannerForm()
+                context.update({'title': 'Добавление сканера', 'form': form, 'item': item})
 
-        if item == 'ibp':
-            form = AddIBPForm()
-            context.update({'title': 'Добавление ИБП', 'form': form, 'item': item})
+            if item == 'ibp':
+                form = AddIBPForm()
+                context.update({'title': 'Добавление ИБП', 'form': form, 'item': item})
 
-        if item == 'scale':
-            form = AddScaleForm()
-            context.update({'title': 'Добавление весов', 'form': form, 'item': item})
+            if item == 'scale':
+                form = AddScaleForm()
+                context.update({'title': 'Добавление весов', 'form': form, 'item': item})
 
-        if item == 'phone':
-            form = AddPhoneForm()
-            context.update({'title': 'Добавление телефона', 'form': form, 'item': item})
+            if item == 'phone':
+                form = AddPhoneForm()
+                context.update({'title': 'Добавление телефона', 'form': form, 'item': item})
 
-        if item == 'router':
-            form = AddRouterForm()
-            context.update({'title': 'Добавление маршрутизатора / свича', 'form': form, 'item': item})
+            if item == 'router':
+                form = AddRouterForm()
+                context.update({'title': 'Добавление маршрутизатора / свича', 'form': form, 'item': item})
 
-        if item == 'arm':
-            form = AddARMForm()
-            context.update({'title': 'Добавление АРМ', 'form': form, 'item': item})
+            if item == 'arm':
+                form = AddARMForm()
+                context.update({'title': 'Добавление АРМ', 'form': form, 'item': item})
 
-        return render(request, 'add_item.html', context=context)
+            return render(request, 'add_item.html', context=context)
+        else:
+            return HttpResponseRedirect(reverse('home'))
 
 
     def post(self, request, item):

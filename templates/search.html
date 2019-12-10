@@ -3,42 +3,301 @@
 {% block content %}
     <div class="container-fluid">
             <div class="row d-flex justify-content-center my-3">
-                        <div class="col-10 my-1">
+                        <div class="col-10 my-3">
                             {% if arms %}
-                            <div>Поиск по АРМам:</div>
-                                {% for arm in arms %}
-                                    <div class="ml-5">
-                                        {{ arm }}
-                                    </div>
-                                {% endfor %}
-                            {% endif%}
-                        </div>
+                            <div class="search_title">Поиск по АРМам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Системный блок</th>
+                                                <th>Имя компьютера</th>
+                                                <th>Ip адрес</th>
+                                                <th>Номер штрих кода</th>
 
-                        <div class="col-10 my-1">
-                            {% if units %}
-                            <div>Поиск по системным блокам:</div>
-                                {% for unit in units %}
-                                    <div class="ml-5">
-                                        {{ unit.pk }}
-                                        {{ unit.model }}
-                                        {{ unit.id_naumen }}
-                                        {{ unit.id_invent }}
-                                        {{ unit.id_sn }}
-                                        {{ unit.arm }}
-                                        {{ unit.retired }}
-                                    </div>
-                                {% endfor %}
-                            {% endif%}
-                        </div>
-
-                        <div class="col-10 my-1">
-                        {% if monitors %}
-                            <div>Поиск по мониторам:</div>
-                            {% for monitor in monitors %}
-                                <div class="ml-5">
-                                    {{ monitor }}
+                                            </tr>
+                                        </thead>
+                                        {% for arm in arms %}
+                                            <tr>
+                                                <td> {{ arm.pk }} </td>
+                                                <td> {{ arm.unit_arm }} </td>
+                                                <td> {{ arm.comp_name }} </td>
+                                                <td> {{ arm.ip }} </td>
+                                                <td> {{ arm.barcode_id }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
                                 </div>
-                            {% endfor %}
+                            {% endif%}
+                        </div>
+
+                        <div class="col-10 my-3">
+                            {% if units %}
+                            <div class="search_title">Поиск по системным блокам:</div>
+                            <div class="ml-5 mt-1">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Модель</th>
+                                            <th>Номер Naumen</th>
+                                            <th>Инвентарный номер</th>
+                                            <th>Серийный номер</th>
+                                            <th>АРМ</th>
+                                            <th>Списан</th>
+                                        </tr>
+                                    </thead>
+                                    {% for unit in units %}
+                                        <tr>
+                                            <td> {{ unit.pk }} </td>
+                                            <td> {{ unit.model }} </td>
+                                            <td> {{ unit.id_naumen }} </td>
+                                            <td> {{ unit.id_invent }} </td>
+                                            <td> {{ unit.id_sn }} </td>
+                                            <td> {{ unit.arm }} </td>
+                                            <td> {{ unit.retired }} </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                            {% endif%}
+                        </div>
+
+                        <div class="col-10 my-3">
+                        {% if monitors %}
+                            <div class="search_title">Поиск по мониторам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Номер Naumen</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>АРМ</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for monitor in monitors %}
+                                            <tr>
+                                                <td> {{ monitor.pk }} </td>
+                                                <td> {{ monitor.model }} </td>
+                                                <td> {{ monitor.id_naumen }} </td>
+                                                <td> {{ monitor.id_invent }} </td>
+                                                <td> {{ monitor.id_sn }} </td>
+                                                <td> {{ monitor.arm }} </td>
+                                                <td> {{ monitor.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                        {% endif%}
+                        </div>
+
+
+                        <div class="col-10 my-3">
+                        {% if printers %}
+                            <div class="search_title">Поиск по МФУ/принтерам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Номер Naumen</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>АРМ</th>
+                                                <th>Номер штрих кода</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for printer in printers %}
+                                            <tr>
+                                                <td> {{ printer.pk }} </td>
+                                                <td> {{ printer.model }} </td>
+                                                <td> {{ printer.id_naumen }} </td>
+                                                <td> {{ printer.id_invent }} </td>
+                                                <td> {{ printer.id_sn }} </td>
+                                                <td> {{ printer.arm }} </td>
+                                                <td> {{ printer.barcode_id }} </td>
+                                                <td> {{ printer.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                        {% endif%}
+                        </div>
+
+
+                        <div class="col-10 my-3">
+                        {% if scanners %}
+                            <div class="search_title">Поиск по сканерам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Номер Naumen</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>АРМ</th>
+                                                <th>Номер штрих кода</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for scanner in scanners %}
+                                            <tr>
+                                                <td> {{ scanner.pk }} </td>
+                                                <td> {{ scanner.model }} </td>
+                                                <td> {{ scanner.id_naumen }} </td>
+                                                <td> {{ scanner.id_invent }} </td>
+                                                <td> {{ scanner.id_sn }} </td>
+                                                <td> {{ scanner.arm }} </td>
+                                                <td> {{ scanner.barcode_id }} </td>
+                                                <td> {{ scanner.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                        {% endif%}
+                        </div>
+
+                        <div class="col-10 my-3">
+                        {% if ibps %}
+                            <div class="search_title">Поиск по ИБП:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Номер Naumen</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>АРМ</th>
+                                                <th>Номер штрих кода</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for ibp in ibps %}
+                                            <tr>
+                                                <td> {{ ibp.pk }} </td>
+                                                <td> {{ ibp.model }} </td>
+                                                <td> {{ ibp.id_naumen }} </td>
+                                                <td> {{ ibp.id_invent }} </td>
+                                                <td> {{ ibp.id_sn }} </td>
+                                                <td> {{ ibp.arm }} </td>
+                                                <td> {{ ibp.barcode_id }} </td>
+                                                <td> {{ ibp.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                        {% endif%}
+                        </div>
+
+
+                        <div class="col-10 my-3">
+                        {% if scales %}
+                            <div class="search_title">Поиск по весам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Номер Naumen</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>АРМ</th>
+                                                <th>Номер штрих кода</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for scale in scales %}
+                                            <tr>
+                                                <td> {{ scale.pk }} </td>
+                                                <td> {{ scale.model }} </td>
+                                                <td> {{ scale.id_naumen }} </td>
+                                                <td> {{ scale.id_invent }} </td>
+                                                <td> {{ scale.id_sn }} </td>
+                                                <td> {{ scale.arm }} </td>
+                                                <td> {{ scale.barcode_id }} </td>
+                                                <td> {{ scale.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                        {% endif%}
+                        </div>
+
+
+                        <div class="col-10 my-3">
+                        {% if phones %}
+                            <div class="search_title">Поиск по телефонам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Номер Naumen</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>АРМ</th>
+                                                <th>Номер штрих кода</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for phone in phones %}
+                                            <tr>
+                                                <td> {{ phone.pk }} </td>
+                                                <td> {{ phone.model }} </td>
+                                                <td> {{ phone.id_naumen }} </td>
+                                                <td> {{ phone.id_invent }} </td>
+                                                <td> {{ phone.id_sn }} </td>
+                                                <td> {{ phone.arm }} </td>
+                                                <td> {{ phone.barcode_id }} </td>
+                                                <td> {{ phone.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                        {% endif%}
+                        </div>
+
+
+                        <div class="col-10 my-3">
+                        {% if routers %}
+                            <div class="search_title">Поиск по маршрутизаторам и свичам:</div>
+                                <div class="ml-5 mt-1">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Модель</th>
+                                                <th>Инвентарный номер</th>
+                                                <th>Серийный номер</th>
+                                                <th>Ip адрес</th>
+                                                <th>Списан</th>
+                                            </tr>
+                                        </thead>
+                                        {% for router in routers %}
+                                            <tr>
+                                                <td> {{ router.pk }} </td>
+                                                <td> {{ router.model }} </td>
+                                                <td> {{ router.id_invent }} </td>
+                                                <td> {{ router.id_sn }} </td>
+                                                <td> {{ router.ip }} </td>
+                                                <td> {{ router.retired }} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
                         {% endif%}
                         </div>
 
