@@ -7,6 +7,11 @@ from django.urls import reverse
 from django.db.models import Q
 
 
+def _clear(lst):
+    for i in range(len(lst)):
+        if lst[i] == None or lst[i] == '':
+            lst[i] = '-'
+    return lst
 
 class UserLoginRegistration(View):
     def get(self, request):
@@ -334,12 +339,6 @@ class AddItem(View):
 
 
 class ShowItems(View):
-    def _clear(self, lst):
-        for i in range(len(lst)):
-            if lst[i] == None or lst[i] == '':
-                lst[i] = '-'
-        return lst
-
 
     def get(self, request, items):
         context = {}
@@ -347,7 +346,7 @@ class ShowItems(View):
             all_items = Unit.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, memory, os, id_naumen, id_invent, id_sn, arm, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.memory,
@@ -358,7 +357,7 @@ class ShowItems(View):
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Unit._meta.fields]
-                context.update({'title': 'Системные блоки', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Системные блоки', 'heads': heads, 'vals': vals, 'item': 'unit'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Системные блоки" пуст.'})
 
@@ -366,7 +365,7 @@ class ShowItems(View):
             all_items = Monitor.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_naumen, id_invent, id_sn, arm, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_naumen,
@@ -375,7 +374,7 @@ class ShowItems(View):
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Monitor._meta.fields]
-                context.update({'title': 'Мониторы', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Мониторы', 'heads': heads, 'vals': vals, 'item': 'monitor'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Мониторы" пуст.'})
 
@@ -383,7 +382,7 @@ class ShowItems(View):
             all_items = Printer.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_naumen, id_invent, id_sn, arm, ip, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_naumen,
@@ -393,7 +392,7 @@ class ShowItems(View):
                      x.ip,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Printer._meta.fields]
-                context.update({'title': 'Принтеры', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Принтеры', 'heads': heads, 'vals': vals, 'item': 'printer'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Принтеры" пуст.'})
 
@@ -401,7 +400,7 @@ class ShowItems(View):
             all_items = Scanner.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_naumen, id_invent, id_sn, id_sn_base, arm, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_naumen,
@@ -411,7 +410,7 @@ class ShowItems(View):
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Scanner._meta.fields]
-                context.update({'title': 'Сканеры', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Сканеры', 'heads': heads, 'vals': vals, 'item': 'scanner'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Сканеры" пуст.'})
 
@@ -419,7 +418,7 @@ class ShowItems(View):
             all_items = IBP.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_naumen, id_invent, id_sn, arm, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_naumen,
@@ -428,7 +427,7 @@ class ShowItems(View):
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in IBP._meta.fields]
-                context.update({'title': 'ИБП', 'heads': heads, 'vals': vals})
+                context.update({'title': 'ИБП', 'heads': heads, 'vals': vals, 'item': 'ibp'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "ИБП" пуст.'})
 
@@ -436,7 +435,7 @@ class ShowItems(View):
             all_items = Phone.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_invent, id_sn, arm, ip, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_invent,
@@ -445,7 +444,7 @@ class ShowItems(View):
                      x.ip,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Phone._meta.fields]
-                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'phone'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Телефоны" пуст.'})
 
@@ -453,7 +452,7 @@ class ShowItems(View):
             all_items = Router.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_invent, id_sn, ip, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_invent,
@@ -461,7 +460,7 @@ class ShowItems(View):
                      x.ip,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Router._meta.fields]
-                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'router'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Маршрутизаторы / свичи" пуст.'})
 
@@ -469,7 +468,7 @@ class ShowItems(View):
             all_items = Scale.objects.all().order_by('-pk')
             if all_items:
                 # pk, model, id_naumen, id_invent, id_sn, arm, retired
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.model,
                      x.id_naumen,
@@ -478,7 +477,7 @@ class ShowItems(View):
                      x.arm,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Scale._meta.fields]
-                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals})
+                context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'scale'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Весы" пуст.'})
 
@@ -486,7 +485,7 @@ class ShowItems(View):
             all_items = ARM.objects.all().order_by('-pk')
             if all_items:
                 # pk, unit_arm, monitor_arm, printer_arm, scanner_arm, ibp_arm, scale_arm, phone_arm, comp_name, ip, comment
-                vals = [self._clear(
+                vals = [_clear(
                     [x.pk,
                      x.unit_arm,
                      x.monitor_arm,
@@ -515,6 +514,17 @@ class ShowItems(View):
 
 class CardItem(View):
     def get(self, request, item, id):
-        item_arm = ARM.objects.get(pk=id)
-        context = {'arm': item_arm}
-        return render(request, 'card_arm.html', context=context)
+
+        context = {}
+        if item == 'unit':
+            rec = Unit.objects.get(pk=id)
+            # [f(x) if condition else g(x) for x in sequence]
+            fields_rec = _clear([getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
+            heads = [y.verbose_name for y in Unit._meta.fields]
+
+
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list})
+
+
+        return render(request, 'card_item.html', context=context)
