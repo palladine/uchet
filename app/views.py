@@ -5,7 +5,8 @@ from django.views import View
 from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm, AddARMForm
 from django.urls import reverse
 from django.db.models import Q
-
+from barcode import generate
+from uchet.settings import BASE_DIR, STATIC_URL
 
 def _clear(lst):
     for i in range(len(lst)):
@@ -153,6 +154,12 @@ class AddItem(View):
             return HttpResponseRedirect(reverse('home'))
 
 
+    def _generate_barcode(self, id):
+        len_id = len(str(id))
+        cipher = 7
+        zeros = cipher-len_id
+        return ('0'*zeros)+str(id)
+
     def post(self, request, item):
         dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
                      'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST),
@@ -200,6 +207,12 @@ class AddItem(View):
                 printer_item.ip = ip
                 printer_item.retired = True if retired else False
                 printer_item.save()
+
+                # generate barcode
+                printer_item.barcode_id = '{}{:0>7}'.format(ord('p'), printer_item.pk)
+                printer_item.save()
+                namecode = generate('code128', printer_item.barcode_id, output='{}/app{}codes/p/{}'.format(BASE_DIR, STATIC_URL, printer_item.barcode_id))
+
                 request.session['status'] = 'success'
                 request.session['msg'] = 'МФУ / принтер добавлен'
 
@@ -390,6 +403,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.arm,
                      x.ip,
+                     x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Printer._meta.fields]
                 context.update({'title': 'Принтеры', 'heads': heads, 'vals': vals, 'item': 'printer'})
@@ -408,6 +422,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.id_sn_base,
                      x.arm,
+                     x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Scanner._meta.fields]
                 context.update({'title': 'Сканеры', 'heads': heads, 'vals': vals, 'item': 'scanner'})
@@ -425,6 +440,7 @@ class ShowItems(View):
                      x.id_invent,
                      x.id_sn,
                      x.arm,
+                     x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in IBP._meta.fields]
                 context.update({'title': 'ИБП', 'heads': heads, 'vals': vals, 'item': 'ibp'})
@@ -442,6 +458,7 @@ class ShowItems(View):
                      x.id_sn,
                      x.arm,
                      x.ip,
+                     x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Phone._meta.fields]
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'phone'})
@@ -475,6 +492,7 @@ class ShowItems(View):
                      x.id_invent,
                      x.id_sn,
                      x.arm,
+                     x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
                 heads = [y.verbose_name for y in Scale._meta.fields]
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'scale'})
@@ -496,13 +514,15 @@ class ShowItems(View):
                      #x.phone_arm,
                      x.comp_name,
                      x.ip,
-                     x.comment,
+                     x.barcode_id,
+                     x.comment
                      ]) for x in all_items]
                 heads = [ARM._meta.get_field('id').verbose_name,
                          ARM._meta.get_field('unit_arm').verbose_name,
                          ARM._meta.get_field('monitor_arm').verbose_name,
                          ARM._meta.get_field('comp_name').verbose_name,
                          ARM._meta.get_field('ip').verbose_name,
+                         ARM._meta.get_field('barcode_id').verbose_name,
                          ARM._meta.get_field('comment').verbose_name
                          ]
                 context.update({'title': 'АРМы', 'heads': heads, 'vals': vals, 'item': 'arm'})
@@ -516,15 +536,32 @@ class CardItem(View):
     def get(self, request, item, id):
 
         context = {}
+
         if item == 'unit':
             rec = Unit.objects.get(pk=id)
-            # [f(x) if condition else g(x) for x in sequence]
             fields_rec = _clear([getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
             heads = [y.verbose_name for y in Unit._meta.fields]
-
-
             fields_list = list(zip(heads, fields_rec))
-            context.update({'fields': fields_list})
+            context = {'fields': fields_list, 'title': 'Системный блок'}
+
+
+        if item == 'monitor':
+            rec = Monitor.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
+            heads = [y.verbose_name for y in Monitor._meta.fields]
+            fields_list = list(zip(heads, fields_rec))
+            context = {'fields': fields_list, 'title': 'Монитор'}
+
+
+        if item == 'printer':
+            rec = Printer.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
+            heads = [y.verbose_name for y in Printer._meta.fields]
+            code = rec.barcode_id if rec.barcode_id else False
+            fields_list = list(zip(heads, fields_rec))
+            context = {'fields': fields_list, 'title': 'МФУ / Принтер', 'code': code, 'prefix': 'p'}
 
 
         return render(request, 'card_item.html', context=context)
