@@ -19,7 +19,7 @@ class ARM(models.Model):
     phone_arm = models.ForeignKey("Phone", on_delete=models.SET_NULL, null=True, blank=True, related_name='phone_arm_id', verbose_name="Телефон")
     comp_name = models.CharField(max_length=100, null=True, blank=True, verbose_name="Имя компьютера")
     ip = models.CharField(max_length=100, null=True, blank=True, verbose_name="IP-адрес")
-    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих кода")
+    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих-кода")
     comment = models.TextField(null=True, blank=True, verbose_name="Комментарий")
 
 
@@ -72,7 +72,7 @@ class Printer(models.Model):
     id_sn = models.CharField(max_length=255, default='', null=False, blank=False, unique=True, verbose_name="Серийный номер")
     arm = models.ForeignKey(ARM, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="АРМ")
     ip = models.CharField(max_length=100, null=True, blank=True, verbose_name="IP-адрес")
-    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих кода")
+    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих-кода")
     retired = models.BooleanField(default=False, null=True, blank=True, verbose_name="Списан")
 
 
@@ -91,7 +91,7 @@ class Scanner(models.Model):
     id_sn = models.CharField(max_length=255, default='', null=False, blank=False, unique=True, verbose_name="Серийный номер")
     id_sn_base = models.CharField(max_length=100, null=True, blank=True, verbose_name="Серийный номер базы")
     arm = models.ForeignKey(ARM, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="АРМ")
-    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих кода")
+    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих-кода")
     retired = models.BooleanField(default=False, null=True, blank=True, verbose_name="Списан")
 
     class Meta:
@@ -108,7 +108,7 @@ class IBP(models.Model):
     id_invent = models.CharField(max_length=255, null=True, blank=True, verbose_name="Инвентарный номер")
     id_sn = models.CharField(max_length=255, default='', null=False, blank=False, unique=True, verbose_name="Серийный номер")
     arm = models.ForeignKey(ARM, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="АРМ")
-    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих кода")
+    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих-кода")
     retired = models.BooleanField(default=False, null=True, blank=True, verbose_name="Списан")
 
     class Meta:
@@ -125,7 +125,7 @@ class Scale(models.Model):
     id_invent = models.CharField(max_length=255, null=True, blank=True, verbose_name="Инвентарный номер")
     id_sn = models.CharField(max_length=255, default='', null=False, blank=False, unique=True, verbose_name="Серийный номер")
     arm = models.ForeignKey(ARM, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="АРМ")
-    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих кода")
+    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих-кода")
     retired = models.BooleanField(default=False, null=True, blank=True, verbose_name="Списаны")
 
     class Meta:
@@ -143,7 +143,7 @@ class Phone(models.Model):
     id_sn = models.CharField(max_length=255, default='', null=False, blank=False, unique=True, verbose_name="Серийный номер")
     arm = models.ForeignKey(ARM, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="АРМ")
     ip = models.CharField(max_length=100, null=True, blank=True, verbose_name="IP-адрес")
-    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих кода")
+    barcode_id = models.CharField(max_length=100, null=True, blank=True, verbose_name="Id штрих-кода")
     retired = models.BooleanField(default=False, null=True, blank=True, verbose_name="Списан")
 
     class Meta:

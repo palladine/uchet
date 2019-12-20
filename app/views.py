@@ -154,12 +154,6 @@ class AddItem(View):
             return HttpResponseRedirect(reverse('home'))
 
 
-    def _generate_barcode(self, id):
-        len_id = len(str(id))
-        cipher = 7
-        zeros = cipher-len_id
-        return ('0'*zeros)+str(id)
-
     def post(self, request, item):
         dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
                      'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST),
@@ -269,7 +263,6 @@ class AddItem(View):
 
 
             # adding ARM
-            # todo field scan-code to model + creating scan-code to arm!
             if item == 'arm':
                 unit_arm_id = request.POST.get('unit_arm')
                 monitor_arm_id = request.POST.get('monitor_arm')
@@ -535,14 +528,14 @@ class ShowItems(View):
 class CardItem(View):
     def get(self, request, item, id):
 
-        context = {}
+        context = {'role': request.user.role}
 
         if item == 'unit':
             rec = Unit.objects.get(pk=id)
             fields_rec = _clear([getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
             heads = [y.verbose_name for y in Unit._meta.fields]
             fields_list = list(zip(heads, fields_rec))
-            context = {'fields': fields_list, 'title': 'Системный блок'}
+            context.update({'fields': fields_list, 'title': 'Системный блок'})
 
 
         if item == 'monitor':
@@ -551,7 +544,7 @@ class CardItem(View):
                 [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
             heads = [y.verbose_name for y in Monitor._meta.fields]
             fields_list = list(zip(heads, fields_rec))
-            context = {'fields': fields_list, 'title': 'Монитор'}
+            context.update({'fields': fields_list, 'title': 'Монитор'})
 
 
         if item == 'printer':
@@ -561,7 +554,7 @@ class CardItem(View):
             heads = [y.verbose_name for y in Printer._meta.fields]
             code = rec.barcode_id if rec.barcode_id else False
             fields_list = list(zip(heads, fields_rec))
-            context = {'fields': fields_list, 'title': 'МФУ / Принтер', 'code': code, 'prefix': 'p'}
+            context.update({'fields': fields_list, 'title': 'МФУ / Принтер', 'code': code, 'prefix': 'p'})
 
 
         return render(request, 'card_item.html', context=context)
