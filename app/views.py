@@ -5,8 +5,9 @@ from django.views import View
 from .forms import LoginForm, AddUnitForm, AddMonitorForm, AddPrinterForm, AddScannerForm, AddIBPForm, AddScaleForm, AddPhoneForm, AddRouterForm, AddARMForm
 from django.urls import reverse
 from django.db.models import Q
-from barcode import generate
 from uchet.settings import BASE_DIR, STATIC_URL
+import barcode
+from io import BytesIO
 
 def _clear(lst):
     for i in range(len(lst)):
@@ -154,6 +155,20 @@ class AddItem(View):
             return HttpResponseRedirect(reverse('home'))
 
 
+    def _generate_barcode_id(self, queryst, prefix):
+        # create barcode id
+        return '{}{:0>7}'.format(ord(prefix), queryst.pk)
+
+
+    def _generate_barcode(self, barcode_id):
+        # create bytes barcode
+        method = barcode.get_barcode_class('code128')
+        code = method(barcode_id)
+        fp = BytesIO()
+        code.write(fp)
+        return fp.getvalue().decode()
+
+
     def post(self, request, item):
         dic_forms = {'unit': AddUnitForm(request.POST), 'monitor': AddMonitorForm(request.POST),
                      'printer': AddPrinterForm(request.POST), 'scanner': AddScannerForm(request.POST),
@@ -171,6 +186,7 @@ class AddItem(View):
             id_sn = request.POST.get('id_sn')
             retired = request.POST.get('retired')
 
+
             if item == 'unit':
                 memory = request.POST.get('memory')
                 os = request.POST.get('os')
@@ -184,6 +200,7 @@ class AddItem(View):
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Системный блок добавлен'
 
+
             if item == 'monitor':
                 monitor_item = Monitor(model=model, id_sn=id_sn)
                 monitor_item.id_naumen = id_naumen
@@ -192,6 +209,7 @@ class AddItem(View):
                 monitor_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Монитор добавлен'
+
 
             if item == 'printer':
                 ip = request.POST.get('ip')
@@ -203,12 +221,12 @@ class AddItem(View):
                 printer_item.save()
 
                 # generate barcode
-                printer_item.barcode_id = '{}{:0>7}'.format(ord('p'), printer_item.pk)
+                printer_item.barcode_id = self._generate_barcode_id(printer_item, 'p')
+                printer_item.barcode = self._generate_barcode(printer_item.barcode_id)
                 printer_item.save()
-                namecode = generate('code128', printer_item.barcode_id, output='{}/app{}codes/p/{}'.format(BASE_DIR, STATIC_URL, printer_item.barcode_id))
-
                 request.session['status'] = 'success'
                 request.session['msg'] = 'МФУ / принтер добавлен'
+
 
             if item == 'scanner':
                 id_sn_base = request.POST.get('id_sn_base')
@@ -218,8 +236,13 @@ class AddItem(View):
                 scanner_item.id_sn_base = id_sn_base
                 scanner_item.retired = True if retired else False
                 scanner_item.save()
+
+                # generate barcode
+                namecode = self._generate_save_barcode(scanner_item, 's')
+
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Сканер добавлен'
+
 
             if item == 'ibp':
                 ibp_item = IBP(model=model, id_sn=id_sn)
@@ -398,7 +421,7 @@ class ShowItems(View):
                      x.ip,
                      x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Printer._meta.fields]
+                heads = [y.verbose_name for y in Printer._meta.fields if y.name != 'barcode']
                 context.update({'title': 'Принтеры', 'heads': heads, 'vals': vals, 'item': 'printer'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Принтеры" пуст.'})
@@ -417,7 +440,7 @@ class ShowItems(View):
                      x.arm,
                      x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Scanner._meta.fields]
+                heads = [y.verbose_name for y in Scanner._meta.fields if y.name != 'barcode']
                 context.update({'title': 'Сканеры', 'heads': heads, 'vals': vals, 'item': 'scanner'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Сканеры" пуст.'})
@@ -435,7 +458,7 @@ class ShowItems(View):
                      x.arm,
                      x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in IBP._meta.fields]
+                heads = [y.verbose_name for y in IBP._meta.fields if y.name != 'barcode']
                 context.update({'title': 'ИБП', 'heads': heads, 'vals': vals, 'item': 'ibp'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "ИБП" пуст.'})
@@ -453,7 +476,7 @@ class ShowItems(View):
                      x.ip,
                      x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Phone._meta.fields]
+                heads = [y.verbose_name for y in Phone._meta.fields if y.name != 'barcode']
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'phone'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Телефоны" пуст.'})
@@ -487,7 +510,7 @@ class ShowItems(View):
                      x.arm,
                      x.barcode_id,
                      "Да" if x.retired else "Нет"]) for x in all_items]
-                heads = [y.verbose_name for y in Scale._meta.fields]
+                heads = [y.verbose_name for y in Scale._meta.fields if y.name != 'barcode']
                 context.update({'title': 'Телефоны', 'heads': heads, 'vals': vals, 'item': 'scale'})
             else:
                 context.update({'status': 'danger', 'msg': 'Список "Весы" пуст.'})
@@ -555,6 +578,17 @@ class CardItem(View):
             code = rec.barcode_id if rec.barcode_id else False
             fields_list = list(zip(heads, fields_rec))
             context.update({'fields': fields_list, 'title': 'МФУ / Принтер', 'code': code, 'prefix': 'p'})
+
+
+        if item == 'scanner':
+            rec = Scanner.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in
+                 [j.name for j in rec._meta.fields]])
+            heads = [y.verbose_name for y in Scanner._meta.fields]
+            code = rec.barcode_id if rec.barcode_id else False
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list, 'title': 'Сканер', 'code': code, 'prefix': 's'})
 
 
         return render(request, 'card_item.html', context=context)
