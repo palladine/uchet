@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row d-flex justify-content-center">
                <div class="d-flex justify-content-center my-4" style="width:700px">
-                       <div class="col">
+                       <div class="col-6">
                            <p><b>Оборудование:</b> {{title}}</p>
                             {% for field in fields %}
                                 <p><b>{{ field.0 }}:</b> {{field.1}}</p>
@@ -12,11 +12,9 @@
                         </div>
 
                         {% if code %}
-                        <div class="col">
+                        <div class="">
                             <p><b>Штрих-код:</b></p>
-                            {% with 'codes/'|add:prefix|add:'/'|add:code|add:'.svg' as image_static %}
-                                <img src='{% static image_static %}' alt="" height="150" width="160" style="border: 1px solid rgba(200,200,200,.7);">
-                            {% endwith %}
+                            <div style="border:solid 1px rgba(144, 12, 63, .7)">{{ barcode|safe }}</div>
                         </div>
                         {% endif %}
                </div>

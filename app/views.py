@@ -165,7 +165,8 @@ class AddItem(View):
         method = barcode.get_barcode_class('code128')
         code = method(barcode_id)
         fp = BytesIO()
-        code.write(fp)
+        opt = dict(module_width=0.4, module_height=27.0, font_size=12)
+        code.write(fp, options=opt)
         return fp.getvalue().decode()
 
 
@@ -186,7 +187,6 @@ class AddItem(View):
             id_sn = request.POST.get('id_sn')
             retired = request.POST.get('retired')
 
-
             if item == 'unit':
                 memory = request.POST.get('memory')
                 os = request.POST.get('os')
@@ -200,7 +200,6 @@ class AddItem(View):
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Системный блок добавлен'
 
-
             if item == 'monitor':
                 monitor_item = Monitor(model=model, id_sn=id_sn)
                 monitor_item.id_naumen = id_naumen
@@ -210,7 +209,6 @@ class AddItem(View):
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Монитор добавлен'
 
-
             if item == 'printer':
                 ip = request.POST.get('ip')
                 printer_item = Printer(model=model, id_sn=id_sn)
@@ -219,14 +217,12 @@ class AddItem(View):
                 printer_item.ip = ip
                 printer_item.retired = True if retired else False
                 printer_item.save()
-
                 # generate barcode
                 printer_item.barcode_id = self._generate_barcode_id(printer_item, 'p')
                 printer_item.barcode = self._generate_barcode(printer_item.barcode_id)
                 printer_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'МФУ / принтер добавлен'
-
 
             if item == 'scanner':
                 id_sn_base = request.POST.get('id_sn_base')
@@ -236,19 +232,22 @@ class AddItem(View):
                 scanner_item.id_sn_base = id_sn_base
                 scanner_item.retired = True if retired else False
                 scanner_item.save()
-
                 # generate barcode
-                namecode = self._generate_save_barcode(scanner_item, 's')
-
+                scanner_item.barcode_id = self._generate_barcode_id(scanner_item, 's')
+                scanner_item.barcode = self._generate_barcode(scanner_item.barcode_id)
+                scanner_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Сканер добавлен'
-
 
             if item == 'ibp':
                 ibp_item = IBP(model=model, id_sn=id_sn)
                 ibp_item.id_naumen = id_naumen
                 ibp_item.id_invent = id_invent
                 ibp_item.retired = True if retired else False
+                ibp_item.save()
+                # generate barcode
+                ibp_item.barcode_id = self._generate_barcode_id(ibp_item, 'i')
+                ibp_item.barcode = self._generate_barcode(ibp_item.barcode_id)
                 ibp_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'ИБП добавлен'
@@ -258,6 +257,10 @@ class AddItem(View):
                 scale_item.id_naumen = id_naumen
                 scale_item.id_invent = id_invent
                 scale_item.retired = True if retired else False
+                scale_item.save()
+                # generate barcode
+                scale_item.barcode_id = self._generate_barcode_id(scale_item, 'c')
+                scale_item.barcode = self._generate_barcode(scale_item.barcode_id)
                 scale_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Весы добавлены'
@@ -269,6 +272,10 @@ class AddItem(View):
                 phone_item.id_invent = id_invent
                 phone_item.ip = ip
                 phone_item.retired = True if retired else False
+                phone_item.save()
+                # generate barcode
+                phone_item.barcode_id = self._generate_barcode_id(phone_item, 'f')
+                phone_item.barcode = self._generate_barcode(phone_item.barcode_id)
                 phone_item.save()
                 request.session['status'] = 'success'
                 request.session['msg'] = 'Телефон добавлен'
@@ -356,6 +363,12 @@ class AddItem(View):
                     phone_obj.save()
 
                 arm_item.save()
+
+                # generate barcode
+                arm_item.barcode_id = self._generate_barcode_id(arm_item, 'a')
+                arm_item.barcode = self._generate_barcode(arm_item.barcode_id)
+                arm_item.save()
+
                 request.session['status'] = 'success'
                 request.session['msg'] = 'АРМ добавлено'
 
@@ -573,22 +586,69 @@ class CardItem(View):
         if item == 'printer':
             rec = Printer.objects.get(pk=id)
             fields_rec = _clear(
-                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
-            heads = [y.verbose_name for y in Printer._meta.fields]
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields if j.name!='barcode']])
+            heads = [y.verbose_name for y in Printer._meta.fields if y.verbose_name!='Штрих-код']
             code = rec.barcode_id if rec.barcode_id else False
             fields_list = list(zip(heads, fields_rec))
-            context.update({'fields': fields_list, 'title': 'МФУ / Принтер', 'code': code, 'prefix': 'p'})
+            context.update({'fields': fields_list, 'title': 'МФУ / Принтер', 'code': code, 'barcode': rec.barcode})
 
 
         if item == 'scanner':
             rec = Scanner.objects.get(pk=id)
             fields_rec = _clear(
-                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in
-                 [j.name for j in rec._meta.fields]])
-            heads = [y.verbose_name for y in Scanner._meta.fields]
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields if j.name!='barcode']])
+            heads = [y.verbose_name for y in Scanner._meta.fields if y.verbose_name!='Штрих-код']
             code = rec.barcode_id if rec.barcode_id else False
             fields_list = list(zip(heads, fields_rec))
-            context.update({'fields': fields_list, 'title': 'Сканер', 'code': code, 'prefix': 's'})
+            context.update({'fields': fields_list, 'title': 'Сканер', 'code': code, 'barcode': rec.barcode})
+
+
+        if item == 'ibp':
+            rec = IBP.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields if j.name!='barcode']])
+            heads = [y.verbose_name for y in IBP._meta.fields if y.verbose_name!='Штрих-код']
+            code = rec.barcode_id if rec.barcode_id else False
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list, 'title': 'ИБП', 'code': code, 'barcode': rec.barcode})
+
+
+        if item == 'scale':
+            rec = Scale.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields if j.name!='barcode']])
+            heads = [y.verbose_name for y in Scale._meta.fields if y.verbose_name!='Штрих-код']
+            code = rec.barcode_id if rec.barcode_id else False
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list, 'title': 'Весы', 'code': code, 'barcode': rec.barcode})
+
+
+        if item == 'phone':
+            rec = Phone.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields if j.name!='barcode']])
+            heads = [y.verbose_name for y in Phone._meta.fields if y.verbose_name!='Штрих-код']
+            code = rec.barcode_id if rec.barcode_id else False
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list, 'title': 'Телефон', 'code': code, 'barcode': rec.barcode})
+
+
+        if item == 'router':
+            rec = Router.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields]])
+            heads = [y.verbose_name for y in Router._meta.fields]
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list, 'title': 'Маршрутизатор / Свич'})
+
+        if item == 'arm':
+            rec = ARM.objects.get(pk=id)
+            fields_rec = _clear(
+                [getattr(rec, i) if i != 'retired' else 'Нет' if getattr(rec, i) == False else 'Да' for i in [j.name for j in rec._meta.fields if j.name != 'barcode']])
+            heads = [y.verbose_name for y in ARM._meta.fields if y.verbose_name != 'Штрих-код']
+            code = rec.barcode_id if rec.barcode_id else False
+            fields_list = list(zip(heads, fields_rec))
+            context.update({'fields': fields_list, 'title': 'АРМ', 'code': code, 'barcode': rec.barcode})
 
 
         return render(request, 'card_item.html', context=context)
