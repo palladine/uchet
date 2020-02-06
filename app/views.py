@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, render_to_response, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Unit, Monitor, Printer, Scanner, IBP, Scale, Phone, Router, ARM
 from django.views import View
