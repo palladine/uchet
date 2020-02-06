@@ -1,3 +1,4 @@
 .idea/
 .app/migrations/
 *.sqlite3
+*.log
